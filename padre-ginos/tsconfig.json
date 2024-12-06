@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "allowJs": true, // Allows JavaScript files to be compiled
+    "checkJs": false, // Disables type checking for JavaScript files
+    "skipLibCheck": true, // Skips type checking of declaration files (*.d.ts)
+    "noEmit": true, // Prevents emitting output files
+    "strict": false // Disables all strict type-checking options
+  },
+  "include": [
+    "src/**/*" // Adjust the path as necessary for your project structure
+  ]
+}
