@@ -5,9 +5,34 @@ import getPastOrders from "../api/getPastOrders";
 import getPastOrder from "../api/getPastOrder";
 import { priceConverter } from "../useCurrency";
 import Modal from "../Modal";
+import ErrorBoundary from "../ErrorBoundary";
+
 export const Route = createLazyFileRoute("/past")({
-  component: PastOrdersRoute,
+  component: ErrorBoundaryWrappedPastOrderRoutes,
 });
+
+function ErrorBoundaryWrappedPastOrderRoutes() {
+  /* 
+   the error boundary has to be outside of the component definition
+   in order to catch any errors
+  if we needed to pass props, we'd do:
+  
+  function ErrorBoundaryWrappedPastOrderRoutes(props) {
+  return (
+    <ErrorBoundary>
+    
+      <PastOrdersRoute  {...props} />
+    </ErrorBoundary>
+  );
+}
+  * tip: only spread props like ^ when you want to indicate a component is a pass thru component
+  */
+  return (
+    <ErrorBoundary>
+      <PastOrdersRoute />
+    </ErrorBoundary>
+  );
+}
 
 function PastOrdersRoute() {
   const [page, setPage] = useState(1);
