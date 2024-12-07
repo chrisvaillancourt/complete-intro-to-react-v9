@@ -1,7 +1,5 @@
-const intl = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-});
+import { priceConverter } from "./useCurrency";
+
 export default function Cart({ cart, checkout }) {
   const total = cart.reduce((total, curr) => {
     total += curr.pizza.sizes[curr.size];
@@ -21,7 +19,7 @@ export default function Cart({ cart, checkout }) {
           </li>
         ))}
       </ul>
-      <p>Total: {intl.format(total)}</p>
+      <p>Total: {priceConverter(total)}</p>
       <button onClick={checkout}>Checkout</button>
     </div>
   );
