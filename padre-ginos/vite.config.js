@@ -18,10 +18,4 @@ export default defineConfig({
   },
   // router needd to be before react
   plugins: [TanStackRouterVite(), react()],
-  test: {
-    environment: "happy-dom",
-    coverage: {
-      reporter: ["text", "json", "html"],
-    },
-  },
 });
