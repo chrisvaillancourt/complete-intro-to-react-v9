@@ -52,6 +52,10 @@ function Order() {
     fetchPizzaTypes();
   }, []);
 
+  function addToCart() {
+    setCart([...cart, { pizza: selectedPizza, size: pizzaSize, price }]);
+  }
+
   return (
     <div className="order-page">
       <div className="order">
@@ -60,15 +64,7 @@ function Order() {
       instead of the button inside of the form so someone can hit 
       enter without needing to click the submit button. It's also better
       for accessibility. */}
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            setCart([
-              ...cart,
-              { pizza: selectedPizza, size: pizzaSize, price },
-            ]);
-          }}
-        >
+        <form action={addToCart}>
           <div>
             <div>
               <label htmlFor="pizza-type">Pizza Type</label>
