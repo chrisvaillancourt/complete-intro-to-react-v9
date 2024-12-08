@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, Suspense, use } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import getPastOrders from "../api/getPastOrders";
@@ -13,36 +13,50 @@ export const Route = createLazyFileRoute("/past")({
 
 function ErrorBoundaryWrappedPastOrderRoutes() {
   /* 
-   the error boundary has to be outside of the component definition
-   in order to catch any errors
+  the error boundary has to be outside of the component definition
+  in order to catch any errors
   if we needed to pass props, we'd do:
   
   function ErrorBoundaryWrappedPastOrderRoutes(props) {
   return (
     <ErrorBoundary>
     
-      <PastOrdersRoute  {...props} />
+    <PastOrdersRoute  {...props} />
     </ErrorBoundary>
-  );
-}
-  * tip: only spread props like ^ when you want to indicate a component is a pass thru component
-  */
-  return (
-    <ErrorBoundary>
-      <PastOrdersRoute />
-    </ErrorBoundary>
-  );
-}
-
-function PastOrdersRoute() {
+    );
+    }
+    * tip: only spread props like ^ when you want to indicate a component is a pass thru component
+    */
   const [page, setPage] = useState(1);
-  const [focusedOrder, setFocusedOrder] = useState(null);
-  const { isLoading, data } = useQuery({
+  // the query has to exist outside of the suspense boundary
+  const loadedPromise = useQuery({
     // queryKey is how that query is stored in the cache; sets the name of the key in the cache
     queryKey: ["past-orders", page],
     queryFn: () => getPastOrders(page),
     staleTime: 30000,
-  });
+  }).promise;
+  return (
+    <ErrorBoundary>
+      <Suspense
+        fallback={
+          <div className="past-orders">
+            <h2>Loading Past Order ...</h2>
+          </div>
+        }
+      >
+        <PastOrdersRoute
+          loadedPromise={loadedPromise}
+          page={page}
+          setPage={setPage}
+        />
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
+function PastOrdersRoute({ page, setPage, loadedPromise }) {
+  const data = use(loadedPromise); // if this promise isn't resolved, the component will be suspended
+  const [focusedOrder, setFocusedOrder] = useState(null);
   const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000;
   const { isLoading: isLoadingPastOrder, data: pastOrderData } = useQuery({
     queryKey: ["past-order", focusedOrder],
@@ -51,13 +65,6 @@ function PastOrdersRoute() {
     enabled: Boolean(focusedOrder), // we only want to request a focused order if one exists
   });
 
-  if (isLoading) {
-    return (
-      <div className="past-orders">
-        <h2>LOADING ...</h2>
-      </div>
-    );
-  }
   return (
     <div className="past-orders">
       <table>
